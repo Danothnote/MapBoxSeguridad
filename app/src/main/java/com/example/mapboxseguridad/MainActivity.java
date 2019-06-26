@@ -9,7 +9,6 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 
@@ -41,6 +40,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -49,7 +49,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.InputStream;
@@ -85,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
 
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
+
+    boolean mostrar = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Danothnote/MapBoxSeguridad"));
             startActivity(browserIntent);
         } else if (id == R.id.nav_gallery) {
-
+            mostrar = false;
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_tools) {
@@ -180,13 +181,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onStyleLoaded(@NonNull Style style) {
                         style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
                         style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
-                        style.addLayerBelow(new FillLayer("layer-id", "source-id").withProperties(
-                                fillColor(Color.argb(60, 255, 104, 51))), "settlement-label"
+                        style.addLayerBelow(new FillLayer("layer-id", "source-id").withProperties(propiedades()), "settlement-label"
                         );
                         enableLocationComponent(style);
                         addHeatmapLayer(style);
                     }
                 });
+    }
+
+    public PropertyValue<String> propiedades(){
+        if (mostrar == true){
+            PropertyValue<String> color = fillColor(Color.argb(60, 255, 104, 51));
+            return color;
+        } else {
+            PropertyValue<String> color = fillColor(Color.argb(0, 255, 104, 51));
+            return color;
+        }
+
     }
 
     private String loadGeoJsonFromAsset(String filename) {
