@@ -23,15 +23,40 @@
     <include layout="@layout/content_main" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/myLocationButton"
+        android:id="@+id/check_poligono"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
+        android:layout_gravity="bottom|center"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_menu_mylocation"
+        app:srcCompat="@android:drawable/ic_lock_power_off"
         app:borderWidth="0dp"
         app:elevation="6dp"
         app:pressedTranslationZ="12dp"
         app:fabSize="mini" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/check_heat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginLeft="170dp"
+        android:layout_marginBottom="20dp"
+        app:srcCompat="@android:drawable/ic_dialog_map"
+        app:borderWidth="0dp"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        app:fabSize="mini" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:id="@+id/myLocationButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|end"
+    android:layout_margin="@dimen/fab_margin"
+    app:srcCompat="@android:drawable/ic_menu_mylocation"
+    app:borderWidth="0dp"
+    app:elevation="6dp"
+    app:pressedTranslationZ="12dp"
+    app:fabSize="mini" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

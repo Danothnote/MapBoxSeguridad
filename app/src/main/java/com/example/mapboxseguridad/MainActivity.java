@@ -40,7 +40,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer;
-import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -73,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String SEGURIDAD_SOURCE_ID = "seguridad-id";
     private static final String HEATMAP_LAYER_ID = "seguridad-heat";
     private static final String HEATMAP_SOURCE_ID = "seguridad-source-id";
+    private static final String LAYER_ID ="layer-id";
 
     private MapboxMap mapboxMap;
     private MapView mapView;
@@ -85,12 +85,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
-    boolean mostrar = true;
+    private boolean mostrar;
+    private boolean heat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mostrar = true;
         Mapbox.getInstance(this, getString(R.string.access_token));
 
         setContentView(R.layout.activity_main);
@@ -154,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Danothnote/MapBoxSeguridad"));
             startActivity(browserIntent);
         } else if (id == R.id.nav_gallery) {
-            mostrar = false;
+
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_tools) {
@@ -177,27 +178,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/danohealer/cjxbcwi6s4eob1cpw6lupzig3"),
                 new Style.OnStyleLoaded() {
+
                     @Override
-                    public void onStyleLoaded(@NonNull Style style) {
+                    public void onStyleLoaded(@NonNull final Style style) {
                         style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
                         style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
-                        style.addLayerBelow(new FillLayer("layer-id", "source-id").withProperties(propiedades()), "settlement-label"
-                        );
+                        style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(60, 255, 104, 51))), "settlement-label");
+
+                        findViewById(R.id.check_poligono).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (mostrar == true) {
+                                    mostrar = false;
+                                    style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(0,255,104,51)));
+                                } else {
+                                    mostrar = true;
+                                    style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(60,255,104,51)));
+                                }
+                            }
+                        });
                         enableLocationComponent(style);
                         addHeatmapLayer(style);
                     }
                 });
-    }
-
-    public PropertyValue<String> propiedades(){
-        if (mostrar == true){
-            PropertyValue<String> color = fillColor(Color.argb(60, 255, 104, 51));
-            return color;
-        } else {
-            PropertyValue<String> color = fillColor(Color.argb(0, 255, 104, 51));
-            return color;
-        }
-
     }
 
     private String loadGeoJsonFromAsset(String filename) {
@@ -218,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void addHeatmapLayer(@NonNull Style loadedMapStyle) {
-        HeatmapLayer layer = new HeatmapLayer(HEATMAP_LAYER_ID, SEGURIDAD_SOURCE_ID);
+        final HeatmapLayer layer = new HeatmapLayer(HEATMAP_LAYER_ID, SEGURIDAD_SOURCE_ID);
         layer.setMaxZoom(19);
         layer.setSourceLayer(HEATMAP_SOURCE_ID);
         layer.setProperties(
@@ -243,6 +246,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 heatmapOpacity(0.6f)
         );
         loadedMapStyle.addLayerAbove(layer, "parques");
+
+        findViewById(R.id.check_heat).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (heat == true) {
+                    heat = false;
+                    layer.setProperties(
+                            heatmapColor(
+                                    interpolate(
+                                            linear(), heatmapDensity(),
+                                            literal(0.01), rgba(0, 0, 0, 0),
+                                            literal(0.1), rgba(0, 2, 114, 0),
+                                            literal(0.2), rgba(0, 6, 219, 0),
+                                            literal(0.3), rgba(0, 74, 255, 0),
+                                            literal(0.4), rgba(0, 202, 255, 0),
+                                            literal(0.5), rgba(73, 255, 154, 0),
+                                            literal(0.6), rgba(171, 255, 59, 0),
+                                            literal(0.7), rgba(255, 197, 3, 0),
+                                            literal(0.8), rgba(255, 82, 1, 0),
+                                            literal(0.9), rgba(196, 0, 1, 0),
+                                            literal(0.95), rgba(121, 0, 0, 0)
+                                    )
+                            ),
+                            heatmapIntensity(2f),
+                            heatmapRadius(30f),
+                            heatmapOpacity(0f)
+                    );
+                } else {
+                    heat = true;
+                    layer.setProperties(
+                            heatmapColor(
+                                    interpolate(
+                                            linear(), heatmapDensity(),
+                                            literal(0.01), rgba(0, 0, 0, 0),
+                                            literal(0.1), rgba(0, 2, 114, .1),
+                                            literal(0.2), rgba(0, 6, 219, .15),
+                                            literal(0.3), rgba(0, 74, 255, .2),
+                                            literal(0.4), rgba(0, 202, 255, .25),
+                                            literal(0.5), rgba(73, 255, 154, .3),
+                                            literal(0.6), rgba(171, 255, 59, .35),
+                                            literal(0.7), rgba(255, 197, 3, .4),
+                                            literal(0.8), rgba(255, 82, 1, 0.6),
+                                            literal(0.9), rgba(196, 0, 1, 0.6),
+                                            literal(0.95), rgba(121, 0, 0, 0.6)
+                                    )
+                            ),
+                            heatmapIntensity(2f),
+                            heatmapRadius(30f),
+                            heatmapOpacity(0.6f)
+                    );
+                }
+            }
+        });
+
     }
 
     @SuppressWarnings( {"MissingPermission"})
