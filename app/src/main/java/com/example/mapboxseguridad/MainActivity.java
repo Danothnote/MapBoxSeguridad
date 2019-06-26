@@ -246,11 +246,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 heatmapOpacity(0.6f)
         );
         loadedMapStyle.addLayerAbove(layer, "parques");
-
+        heat=true;
         findViewById(R.id.check_heat).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (heat == true) {
+
+                if (heat) {
                     heat = false;
                     layer.setProperties(
                             heatmapColor(
