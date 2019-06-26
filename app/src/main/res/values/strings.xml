@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">MapBoxSeguridad</string>
+    <string name="access_token"
+        translatable="false">pk.eyJ1IjoiZGFub2hlYWxlciIsImEiOiJjang5dzdoYXcxMG1tM3B1dGtwc2FsOGY3In0.OTlC7Ftp66SfeAaEi0uCug</string>
+    <string name="user_location_permission_explanation">Si tiene permisos de ubicación</string>
+    <string name="user_location_permission_not_granted">No tiene permisos de ubicación</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
