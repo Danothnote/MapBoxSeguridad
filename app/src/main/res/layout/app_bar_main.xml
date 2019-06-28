@@ -22,30 +22,33 @@
 
     <include layout="@layout/content_main" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/check_poligono"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_lock_power_off"
-        app:borderWidth="0dp"
-        app:elevation="6dp"
-        app:pressedTranslationZ="12dp"
-        app:fabSize="mini" />
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fab_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="70dp"
+        android:layout_marginRight="15dp"
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/check_heat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_marginLeft="170dp"
-        android:layout_marginBottom="20dp"
-        app:srcCompat="@android:drawable/ic_dialog_map"
-        app:borderWidth="0dp"
-        app:elevation="6dp"
-        app:pressedTranslationZ="12dp"
-        app:fabSize="mini" />
+        app:menu_fab_size="mini">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/check_poligono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_label="Ocultar Polígonos"
+            app:fab_size="mini"
+            android:src="@android:drawable/ic_menu_view"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/check_heat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_label="Ocultar Mapa de Calor"
+            app:fab_size="mini"
+            android:src="@android:drawable/ic_dialog_map"/>
+
+    </com.github.clans.fab.FloatingActionMenu>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
     android:id="@+id/myLocationButton"
@@ -54,9 +57,7 @@
     android:layout_gravity="bottom|end"
     android:layout_margin="@dimen/fab_margin"
     app:srcCompat="@android:drawable/ic_menu_mylocation"
-    app:borderWidth="0dp"
-    app:elevation="6dp"
-    app:pressedTranslationZ="12dp"
+    app:fab_showShadow="true"
     app:fabSize="mini" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

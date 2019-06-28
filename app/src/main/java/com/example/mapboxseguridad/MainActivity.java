@@ -7,6 +7,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.util.Log;
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean mostrar;
     private boolean heat;
 
+    FloatingActionMenu actionMenu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +98,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Mapbox.getInstance(this, getString(R.string.access_token));
 
         setContentView(R.layout.activity_main);
+
+        actionMenu = findViewById(R.id.fab_menu);
+        actionMenu.setClosedOnTouchOutside(true);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
