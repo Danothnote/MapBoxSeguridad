@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             app:fab_label="Ocultar Mapa de Calor"
             app:fab_size="mini"
-            android:src="@android:drawable/ic_dialog_map"/>
+            android:src="@drawable/ic_whatshot_black_24dp"/>
 
     </com.github.clans.fab.FloatingActionMenu>
 
