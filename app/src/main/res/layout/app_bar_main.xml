@@ -29,8 +29,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="70dp"
         android:layout_marginRight="15dp"
-
-        app:menu_fab_size="mini">
+        app:menu_fab_size="mini" >
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/check_poligono"

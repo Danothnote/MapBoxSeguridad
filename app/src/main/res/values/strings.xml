@@ -12,9 +12,9 @@
     <string name="action_settings">Opciones</string>
 
     <string name="menu_home">Página Principal</string>
-    <string name="menu_gallery">Galería</string>
-    <string name="menu_slideshow">Slideshow</string>
-    <string name="menu_tools">Herramientas</string>
-    <string name="menu_share">Compartir</string>
+    <string name="menu_gallery">USFQ</string>
+    <string name="menu_slideshow">PUCE</string>
+    <string name="menu_tools">UTPL</string>
+    <string name="menu_share">Tema Oscuro</string>
     <string name="menu_send">Enviar</string>
 </resources>

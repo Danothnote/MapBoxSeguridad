@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
+    private boolean estilo;
     private boolean mostrar;
     private boolean heat;
 
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setContentView(R.layout.activity_main);
 
-        actionMenu = findViewById(R.id.fab_menu);
+        actionMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
         actionMenu.setClosedOnTouchOutside(true);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -161,12 +162,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Danothnote/MapBoxSeguridad"));
             startActivity(browserIntent);
         } else if (id == R.id.nav_gallery) {
+            CameraPosition position = new CameraPosition.Builder()
+                    .target(new LatLng(-0.196929, -78.436607)) // Sets the new camera position
+                    .zoom(15) // Sets the zoom
+                    .build(); // Creates a CameraPosition from the builder
 
+            mapboxMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(position), 500);
         } else if (id == R.id.nav_slideshow) {
+            CameraPosition position = new CameraPosition.Builder()
+                    .target(new LatLng(-0.2098777, -78.4915942)) // Sets the new camera position
+                    .zoom(15) // Sets the zoom
+                    .build(); // Creates a CameraPosition from the builder
 
+            mapboxMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(position), 500);
         } else if (id == R.id.nav_tools) {
+            CameraPosition position = new CameraPosition.Builder()
+                    .target(new LatLng(-0.1949919, -78.482836)) // Sets the new camera position
+                    .zoom(15) // Sets the zoom
+                    .build(); // Creates a CameraPosition from the builder
 
+            mapboxMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(position), 500);
         } else if (id == R.id.nav_share) {
+            if (estilo) {
+                estilo = false;
+                cambiarTema(estilo);
+            } else {
+                estilo = true;
+                cambiarTema(estilo);
+            }
 
         } else if (id == R.id.nav_send) {
 
@@ -182,31 +208,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mapboxMap.setMaxZoomPreference(18.9);
 
-        mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/danohealer/cjxbcwi6s4eob1cpw6lupzig3"),
-                new Style.OnStyleLoaded() {
+        cambiarTema(false);
+    }
 
-                    @Override
-                    public void onStyleLoaded(@NonNull final Style style) {
-                        style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
-                        style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
-                        style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(60, 255, 104, 51))), "settlement-label");
+    private void cambiarTema(boolean estilo) {
+        if (estilo) {
+            mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/danohealer/cjxh6t40t36z21cqc6z02fwzj"),
+                    new Style.OnStyleLoaded() {
 
-                        findViewById(R.id.check_poligono).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                if (mostrar == true) {
-                                    mostrar = false;
-                                    style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(0,255,104,51)));
-                                } else {
-                                    mostrar = true;
-                                    style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(60,255,104,51)));
+                        @Override
+                        public void onStyleLoaded(@NonNull final Style style) {
+                            style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
+                            style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
+                            style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(60, 255, 104, 51))), "settlement-label");
+
+                            findViewById(R.id.check_poligono).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (mostrar == true) {
+                                        mostrar = false;
+                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(0,255,104,51)));
+                                    } else {
+                                        mostrar = true;
+                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(60,255,104,51)));
+                                    }
                                 }
-                            }
-                        });
-                        enableLocationComponent(style);
-                        addHeatmapLayer(style);
-                    }
-                });
+                            });
+                            enableLocationComponent(style);
+                            addHeatmapLayer(style);
+                        }
+                    });
+        } else {
+            mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/danohealer/cjxbcwi6s4eob1cpw6lupzig3"),
+                    new Style.OnStyleLoaded() {
+
+                        @Override
+                        public void onStyleLoaded(@NonNull final Style style) {
+                            style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
+                            style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
+                            style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(60, 255, 104, 51))), "settlement-label");
+
+                            findViewById(R.id.check_poligono).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (mostrar == true) {
+                                        mostrar = false;
+                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(0,255,104,51)));
+                                    } else {
+                                        mostrar = true;
+                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(60,255,104,51)));
+                                    }
+                                }
+                            });
+                            enableLocationComponent(style);
+                            addHeatmapLayer(style);
+                        }
+                    });
+        }
     }
 
     private String loadGeoJsonFromAsset(String filename) {
@@ -256,7 +314,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         findViewById(R.id.check_heat).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (heat) {
                     heat = false;
                     layer.setProperties(
@@ -306,7 +363,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-
     }
 
     @SuppressWarnings( {"MissingPermission"})
