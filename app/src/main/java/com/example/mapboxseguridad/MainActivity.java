@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void cambiarTema(boolean estilo) {
         if (estilo) {
-            mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/danohealer/cjxh6t40t36z21cqc6z02fwzj"),
+            mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/danohealer/cjxrm9kn36lns1cqeups6qc3m"),
                     new Style.OnStyleLoaded() {
 
                         @Override
