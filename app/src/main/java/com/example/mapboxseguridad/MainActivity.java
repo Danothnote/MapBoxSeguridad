@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.content.Context;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -145,6 +147,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent activityAddres =new Intent(MainActivity.this, addAddress.class);
+            startActivity(activityAddres);
+            Toast.makeText(this, "Ingresar logitud y latitud", Toast.LENGTH_SHORT).show();
 
             return true;
         }
