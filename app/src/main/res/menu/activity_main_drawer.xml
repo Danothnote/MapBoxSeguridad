@@ -22,7 +22,7 @@
             android:title="@string/menu_teleferico" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Apariencia">
         <menu>
             <item
                 android:id="@+id/nav_tema"
