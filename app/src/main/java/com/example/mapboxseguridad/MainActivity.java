@@ -83,6 +83,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.linear;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity;
@@ -133,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean colocadop = false;
     private boolean colocadom = false;
     private boolean colocadot = false;
-    private boolean colocadoi = false;
 
     private Marker featureMarker;
     private int conteo;
@@ -323,13 +323,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         activado = true;
                                         initMarkerIconSymbolLayer(style);
                                         initOptimizedRouteLineLayer(style);
+                                        if (stops.isEmpty()) {
+                                            stops.add(origin);
+                                        }
                                         Toast.makeText(MainActivity.this, R.string.rutas_activadas, Toast.LENGTH_SHORT).show();
                                         mapboxMap.addOnMapClickListener(MainActivity.this);
                                         mapboxMap.addOnMapLongClickListener(MainActivity.this);
                                     } else {
                                         rutas = true;
                                         activado = false;
-                                        colocadoi = false;
                                         Toast.makeText(MainActivity.this, R.string.rutas_desactivadas, Toast.LENGTH_SHORT).show();
                                         stops.clear();
                                         if (mapboxMap != null) {
@@ -382,13 +384,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         activado = true;
                                         initMarkerIconSymbolLayer(style);
                                         initOptimizedRouteLineLayer(style);
+                                        if (stops.isEmpty()) {
+                                            stops.add(origin);
+                                        }
                                         Toast.makeText(MainActivity.this, R.string.rutas_activadas, Toast.LENGTH_SHORT).show();
                                         mapboxMap.addOnMapClickListener(MainActivity.this);
                                         mapboxMap.addOnMapLongClickListener(MainActivity.this);
                                     } else {
                                         rutas = true;
                                         activado = false;
-                                        colocadoi = false;
                                         Toast.makeText(MainActivity.this, R.string.rutas_desactivadas, Toast.LENGTH_SHORT).show();
                                         stops.clear();
                                         if (mapboxMap != null) {
@@ -624,9 +628,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private Point getOrigin(Point origin){
-        if (colocadoi == false) {
+        if (stops.isEmpty()) {
             stops.add(origin);
-            colocadoi = true;
         }
         return origin;
     }
@@ -694,12 +697,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onMapLongClick(@NonNull LatLng point) {
         stops.clear();
-        colocadoi = false;
         if (mapboxMap != null) {
             Style style = mapboxMap.getStyle();
             if (style != null) {
                 resetDestinationMarkers(style);
                 removeOptimizedRoute(style);
+                if (stops.isEmpty()) {
+                    stops.add(origin);
+                }
                 return true;
             }
         }
