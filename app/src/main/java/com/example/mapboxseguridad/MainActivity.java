@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean mostrar;
     private boolean heat;
     private boolean rutas;
+    private boolean activado = false;
 
     FloatingActionMenu actionMenu;
 
@@ -123,6 +124,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MapboxOptimization optimizedClient;
     private List<Point> stops = new ArrayList<>();
     private Point origin;
+    private LatLng point;
+    private boolean colocadop = false;
+    private boolean colocadom = false;
+    private boolean colocadot = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,34 +198,66 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.nav_home) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Danothnote/MapBoxSeguridad"));
             startActivity(browserIntent);
         } else if (id == R.id.nav_panecillo) {
+            point = new LatLng(-0.2310036, -78.519666);
             CameraPosition position = new CameraPosition.Builder()
-                    .target(new LatLng(-0.2310036, -78.519666)) // Sets the new camera position
+                    .target(point) // Sets the new camera position
                     .zoom(15) // Sets the zoom
                     .build(); // Creates a CameraPosition from the builder
-
             mapboxMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(position), 500);
+            if (activado) {
+                if (colocadop == false){
+                    Style style = mapboxMap.getStyle();
+                    if (style != null) {
+                        addDestinationMarker(style, point);
+                        addPointToStopsList(point);
+                        getOptimizedRoute(style, stops);
+                        colocadop = true;
+                    }
+                }
+            }
         } else if (id == R.id.nav_mitaddelmundo) {
+            point = new LatLng(-0.0102496, -78.4464668);
             CameraPosition position = new CameraPosition.Builder()
                     .target(new LatLng(-0.0102496, -78.4464668)) // Sets the new camera position
                     .zoom(15) // Sets the zoom
                     .build(); // Creates a CameraPosition from the builder
-
             mapboxMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(position), 500);
+            if (activado) {
+                if (colocadom == false){
+                    Style style = mapboxMap.getStyle();
+                    if (style != null) {
+                        addDestinationMarker(style, point);
+                        addPointToStopsList(point);
+                        getOptimizedRoute(style, stops);
+                        colocadom = true;
+                    }
+                }
+            }
         } else if (id == R.id.nav_teleferico) {
+            point = new LatLng(-0.1923033, -78.5193715);
             CameraPosition position = new CameraPosition.Builder()
                     .target(new LatLng(-0.1923033, -78.5193715)) // Sets the new camera position
                     .zoom(15) // Sets the zoom
                     .build(); // Creates a CameraPosition from the builder
-
             mapboxMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(position), 500);
+            if (activado) {
+                if (colocadot == false){
+                    Style style = mapboxMap.getStyle();
+                    if (style != null) {
+                        addDestinationMarker(style, point);
+                        addPointToStopsList(point);
+                        getOptimizedRoute(style, stops);
+                        colocadot = true;
+                    }
+                }
+            }
         } else if (id == R.id.nav_tema) {
             if (estilo) {
                 estilo = false;
@@ -265,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 public void onClick(View view) {
                                     if (rutas) {
                                         rutas = false;
+                                        activado = true;
                                         initMarkerIconSymbolLayer(style);
                                         initOptimizedRouteLineLayer(style);
                                         Toast.makeText(MainActivity.this, R.string.rutas_activadas, Toast.LENGTH_SHORT).show();
@@ -272,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         mapboxMap.addOnMapLongClickListener(MainActivity.this);
                                     } else {
                                         rutas = true;
+                                        activado = false;
                                         stops.clear();
                                         if (mapboxMap != null) {
                                             Style style = mapboxMap.getStyle();
@@ -323,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 public void onClick(View view) {
                                     if (rutas) {
                                         rutas = false;
+                                        activado = true;
                                         initMarkerIconSymbolLayer(style);
                                         initOptimizedRouteLineLayer(style);
                                         Toast.makeText(MainActivity.this, R.string.rutas_activadas, Toast.LENGTH_SHORT).show();
@@ -330,6 +370,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         mapboxMap.addOnMapLongClickListener(MainActivity.this);
                                     } else {
                                         rutas = true;
+                                        activado = false;
                                         Toast.makeText(MainActivity.this, R.string.rutas_desactivadas, Toast.LENGTH_SHORT).show();
                                         stops.clear();
                                         if (mapboxMap != null) {
@@ -639,6 +680,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void resetDestinationMarkers(@NonNull Style style) {
+        colocadop = false;
+        colocadom = false;
+        colocadot = false;
         GeoJsonSource optimizedLineSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
         if (optimizedLineSource != null) {
             optimizedLineSource.setGeoJson(Point.fromLngLat(origin.longitude(), origin.latitude()));
