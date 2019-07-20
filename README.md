@@ -5,6 +5,7 @@ Muestra un clustering de los lugares donde han ocurrido insidentes de insegurida
 - Integración de objetos en 3D
 - Realidad Aumentada
 - Recomendaciones de lugares para visitar
+- Mapas Offline
 ## Integrantes
 - Daniel Salazar
 - José Puga
