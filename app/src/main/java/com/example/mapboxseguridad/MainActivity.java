@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.ViewDebug;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -22,6 +24,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.JsonElement;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -38,6 +41,8 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -128,6 +133,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean colocadop = false;
     private boolean colocadom = false;
     private boolean colocadot = false;
+    private boolean colocadoi = false;
+
+    private Marker featureMarker;
+    private int conteo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,13 +146,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setContentView(R.layout.activity_main);
 
+
+
         actionMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
         actionMenu.setClosedOnTouchOutside(true);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        addFirstStopToStopsList();
 
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
@@ -278,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 estilo = true;
                 cambiarTema(estilo);
             }
-
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -306,8 +314,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
                             style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
                             style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(80,49,187,242))), "settlement-label");
-                            style.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID,
-                                    Feature.fromGeometry(Point.fromLngLat(origin.longitude(), origin.latitude()))));
                             style.addSource(new GeoJsonSource("optimized-route-source-id"));
                             findViewById(R.id.check_rutas).setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -323,6 +329,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     } else {
                                         rutas = true;
                                         activado = false;
+                                        colocadoi = false;
+                                        Toast.makeText(MainActivity.this, R.string.rutas_desactivadas, Toast.LENGTH_SHORT).show();
                                         stops.clear();
                                         if (mapboxMap != null) {
                                             Style style = mapboxMap.getStyle();
@@ -330,7 +338,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 resetDestinationMarkers(style);
                                                 removeOptimizedRoute(style);
                                                 removeMarkerIconSymbolLayer(style);
-                                                addFirstStopToStopsList();
                                             }
                                         }
                                         mapboxMap.removeOnMapClickListener(MainActivity.this);
@@ -366,8 +373,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
                             style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
                             style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(80,49,187,242))), "settlement-label");
-                            style.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID,
-                                    Feature.fromGeometry(Point.fromLngLat(origin.longitude(), origin.latitude()))));
                             style.addSource(new GeoJsonSource("optimized-route-source-id"));
                             findViewById(R.id.check_rutas).setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -383,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     } else {
                                         rutas = true;
                                         activado = false;
+                                        colocadoi = false;
                                         Toast.makeText(MainActivity.this, R.string.rutas_desactivadas, Toast.LENGTH_SHORT).show();
                                         stops.clear();
                                         if (mapboxMap != null) {
@@ -391,7 +397,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 resetDestinationMarkers(style);
                                                 removeOptimizedRoute(style);
                                                 removeMarkerIconSymbolLayer(style);
-                                                addFirstStopToStopsList();
                                             }
                                         }
                                         mapboxMap.removeOnMapClickListener(MainActivity.this);
@@ -601,6 +606,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (activity.mapboxMap != null && result.getLastLocation() != null) {
                     activity.mapboxMap.getLocationComponent().forceLocationUpdate(result.getLastLocation());
                     buttonLocation(result.getLastLocation().getLatitude(), result.getLastLocation().getLongitude());
+                    origin = Point.fromLngLat(result.getLastLocation().getLongitude(), result.getLastLocation().getLatitude());
+                    getOrigin(origin);
                 }
             }
         }
@@ -614,6 +621,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private Point getOrigin(Point origin){
+        if (colocadoi == false) {
+            stops.add(origin);
+            colocadoi = true;
+        }
+        return origin;
     }
 
     public void buttonLocation(final double lat, final double lng) {
@@ -679,12 +694,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onMapLongClick(@NonNull LatLng point) {
         stops.clear();
+        colocadoi = false;
         if (mapboxMap != null) {
             Style style = mapboxMap.getStyle();
             if (style != null) {
                 resetDestinationMarkers(style);
                 removeOptimizedRoute(style);
-                addFirstStopToStopsList();
                 return true;
             }
         }
@@ -695,10 +710,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         colocadop = false;
         colocadom = false;
         colocadot = false;
-        GeoJsonSource optimizedLineSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
-        if (optimizedLineSource != null) {
-            optimizedLineSource.setGeoJson(Point.fromLngLat(origin.longitude(), origin.latitude()));
-        }
+        mapboxMap.removeAnnotations();
+        conteo = 0;
     }
 
     private void removeOptimizedRoute(@NonNull Style style) {
@@ -713,26 +726,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void addDestinationMarker(@NonNull Style style, LatLng point) {
-        List<Feature> destinationMarkerList = new ArrayList<>();
-        for (Point singlePoint : stops) {
-            destinationMarkerList.add(Feature.fromGeometry(
-                    Point.fromLngLat(singlePoint.longitude(), singlePoint.latitude())));
+        final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+        List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
+        conteo++;
+        if (features.size() > 0) {
+            Feature feature = features.get(0);
+            String property;
+            StringBuilder stringBuilder = new StringBuilder();
+            if (feature.properties() != null) {
+                if (feature.properties().get("name") != null) {
+                    stringBuilder.append(String.format("%s", feature.properties().get("name")));
+                    stringBuilder.append(System.getProperty("line.separator"));
+                }
+                if (feature.properties().get("type") != null) {
+                    stringBuilder.append(String.format("%s", feature.properties().get("type")));
+                    stringBuilder.append(System.getProperty("line.separator"));
+                } else if (feature.properties().get("class") != null) {
+                    stringBuilder.append(String.format("%s", feature.properties().get("class")));
+                    stringBuilder.append(System.getProperty("line.separator"));
+                }
+                featureMarker = mapboxMap.addMarker(new MarkerOptions()
+                        .position(point)
+                        .title(Integer.toString(conteo))
+                        .snippet(stringBuilder.toString())
+                );
+
+            } else {
+                property = getString(R.string.query_feature_marker_snippet);
+                featureMarker = mapboxMap.addMarker(new MarkerOptions()
+                        .position(point)
+                        .title(Integer.toString(conteo))
+                        .snippet(property)
+                );
+            }
+        } else {
+            featureMarker = mapboxMap.addMarker(new MarkerOptions()
+                    .position(point)
+                    .title(Integer.toString(conteo))
+                    .snippet(getString(R.string.query_feature_marker_snippet))
+            );
         }
-        destinationMarkerList.add(Feature.fromGeometry(Point.fromLngLat(point.getLongitude(), point.getLatitude())));
-        GeoJsonSource iconSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
-        if (iconSource != null) {
-            iconSource.setGeoJson(FeatureCollection.fromFeatures(destinationMarkerList));
-        }
+        mapboxMap.selectMarker(featureMarker);
     }
 
     private void addPointToStopsList(LatLng point) {
         stops.add(Point.fromLngLat(point.getLongitude(), point.getLatitude()));
-    }
-
-    private void addFirstStopToStopsList() {
-        // Set first stop
-        origin = Point.fromLngLat(-78.48260192154108, -0.1922222426672704);
-        stops.add(origin);
     }
 
     private void getOptimizedRoute(@NonNull final Style style, List<Point> coordinates) {
