@@ -23,4 +23,6 @@
     <string name="no_success">Hubo un error</string>
     <string name="successful_but_no_routes">No hay rutas disponibles</string>
 
+    <string name="query_feature_marker_title"></string>
+    <string name="query_feature_marker_snippet"></string>
 </resources>

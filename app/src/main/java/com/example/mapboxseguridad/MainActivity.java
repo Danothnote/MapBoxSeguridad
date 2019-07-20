@@ -211,12 +211,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .newCameraPosition(position), 500);
             if (activado) {
                 if (colocadop == false){
-                    Style style = mapboxMap.getStyle();
-                    if (style != null) {
-                        addDestinationMarker(style, point);
-                        addPointToStopsList(point);
-                        getOptimizedRoute(style, stops);
-                        colocadop = true;
+                    if (alreadyTwelveMarkersOnMap()) {
+                        Toast.makeText(MainActivity.this, R.string.only_twelve_stops_allowed, Toast.LENGTH_LONG).show();
+                    } else {
+                        Style style = mapboxMap.getStyle();
+                        if (style != null) {
+                            addDestinationMarker(style, point);
+                            addPointToStopsList(point);
+                            getOptimizedRoute(style, stops);
+                            colocadop = true;
+                        }
                     }
                 }
             }
@@ -230,12 +234,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .newCameraPosition(position), 500);
             if (activado) {
                 if (colocadom == false){
-                    Style style = mapboxMap.getStyle();
-                    if (style != null) {
-                        addDestinationMarker(style, point);
-                        addPointToStopsList(point);
-                        getOptimizedRoute(style, stops);
-                        colocadom = true;
+                    if (alreadyTwelveMarkersOnMap()) {
+                        Toast.makeText(MainActivity.this, R.string.only_twelve_stops_allowed, Toast.LENGTH_LONG).show();
+                    } else {
+                        Style style = mapboxMap.getStyle();
+                        if (style != null) {
+                            addDestinationMarker(style, point);
+                            addPointToStopsList(point);
+                            getOptimizedRoute(style, stops);
+                            colocadom = true;
+                        }
                     }
                 }
             }
@@ -249,12 +257,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .newCameraPosition(position), 500);
             if (activado) {
                 if (colocadot == false){
-                    Style style = mapboxMap.getStyle();
-                    if (style != null) {
-                        addDestinationMarker(style, point);
-                        addPointToStopsList(point);
-                        getOptimizedRoute(style, stops);
-                        colocadot = true;
+                    if (alreadyTwelveMarkersOnMap()) {
+                        Toast.makeText(MainActivity.this, R.string.only_twelve_stops_allowed, Toast.LENGTH_LONG).show();
+                    } else {
+                        Style style = mapboxMap.getStyle();
+                        if (style != null) {
+                            addDestinationMarker(style, point);
+                            addPointToStopsList(point);
+                            getOptimizedRoute(style, stops);
+                            colocadot = true;
+                        }
                     }
                 }
             }
@@ -719,7 +731,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void addFirstStopToStopsList() {
         // Set first stop
-        origin = Point.fromLngLat(-78.4675293843594, -0.15216391216929992);
+        origin = Point.fromLngLat(-78.48260192154108, -0.1922222426672704);
         stops.add(origin);
     }
 
