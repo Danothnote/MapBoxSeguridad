@@ -32,6 +32,14 @@
         app:menu_fab_size="mini" >
 
         <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/check_rutas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_label="Crear Rutas"
+            app:fab_size="mini"
+            android:src="@drawable/ic_add_location"/>
+
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/check_poligono"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

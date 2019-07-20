@@ -1,20 +1,26 @@
 <resources>
-    <string name="app_name">MapBoxSeguridad</string>
+    <string name="app_name">SafeMove</string>
     <string name="access_token" translatable="false">pk.eyJ1IjoiZGFub2hlYWxlciIsImEiOiJjang5dzdoYXcxMG1tM3B1dGtwc2FsOGY3In0.OTlC7Ftp66SfeAaEi0uCug</string>
     <string name="user_location_permission_explanation">Si tiene permisos de ubicación</string>
     <string name="user_location_permission_not_granted">No tiene permisos de ubicación</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Seguridad Turística</string>
-    <string name="nav_header_subtitle">SeguridadPro@correo.com</string>
+    <string name="nav_header_title">SafeMove</string>
+    <string name="nav_header_subtitle">SafeMove@correo.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Agregar Lugar</string>
 
     <string name="menu_home">Página Principal</string>
-    <string name="menu_gallery">USFQ</string>
-    <string name="menu_slideshow">PUCE</string>
-    <string name="menu_tools">UTPL</string>
-    <string name="menu_share">Tema Oscuro</string>
-    <string name="menu_send">Enviar</string>
+    <string name="menu_panecillo">Panecillo</string>
+    <string name="menu_mitaddelmundo">Mitad del Mundo</string>
+    <string name="menu_teleferico">Teleférico</string>
+    <string name="menu_tema">Tema Oscuro</string>
     <string name="title_activity_add_address">addAddress</string>
+
+    <string name="rutas_activadas">Toque para añadir ubicación</string>
+    <string name="rutas_desactivadas">Rutas Desactivadas</string>
+    <string name="only_twelve_stops_allowed">Maximo se permiten 12 ubicaciones</string>
+    <string name="no_success">Hubo un error</string>
+    <string name="successful_but_no_routes">No hay rutas disponibles</string>
+
 </resources>

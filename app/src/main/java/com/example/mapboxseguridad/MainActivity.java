@@ -2,11 +2,11 @@ package com.example.mapboxseguridad;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.content.Context;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -29,6 +29,14 @@ import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.api.directions.v5.DirectionsCriteria;
+import com.mapbox.api.directions.v5.models.DirectionsRoute;
+import com.mapbox.api.optimization.v1.MapboxOptimization;
+import com.mapbox.api.optimization.v1.models.OptimizationResponse;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.LineString;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -43,6 +51,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -51,14 +61,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
-import android.widget.Toast;
 
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
+import static com.mapbox.core.constants.Constants.PRECISION_6;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.linear;
@@ -69,8 +83,15 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, PermissionsListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, MapboxMap.OnMapClickListener, MapboxMap.OnMapLongClickListener, PermissionsListener {
 
     private static final String SEGURIDAD_SOURCE_ID = "seguridad-id";
     private static final String HEATMAP_LAYER_ID = "seguridad-heat";
@@ -91,8 +112,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean estilo;
     private boolean mostrar;
     private boolean heat;
+    private boolean rutas;
 
     FloatingActionMenu actionMenu;
+
+    private static final String ICON_GEOJSON_SOURCE_ID = "icon-source-id";
+    private static final String TEAL_COLOR = "#23D2BE";
+    private static final float POLYLINE_WIDTH = 5;
+    private DirectionsRoute optimizedRoute;
+    private MapboxOptimization optimizedClient;
+    private List<Point> stops = new ArrayList<>();
+    private Point origin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +137,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        addFirstStopToStopsList();
 
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
@@ -165,31 +197,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_home) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Danothnote/MapBoxSeguridad"));
             startActivity(browserIntent);
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_panecillo) {
             CameraPosition position = new CameraPosition.Builder()
-                    .target(new LatLng(-0.196929, -78.436607)) // Sets the new camera position
+                    .target(new LatLng(-0.2310036, -78.519666)) // Sets the new camera position
                     .zoom(15) // Sets the zoom
                     .build(); // Creates a CameraPosition from the builder
 
             mapboxMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(position), 500);
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_mitaddelmundo) {
             CameraPosition position = new CameraPosition.Builder()
-                    .target(new LatLng(-0.2098777, -78.4915942)) // Sets the new camera position
+                    .target(new LatLng(-0.0102496, -78.4464668)) // Sets the new camera position
                     .zoom(15) // Sets the zoom
                     .build(); // Creates a CameraPosition from the builder
 
             mapboxMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(position), 500);
-        } else if (id == R.id.nav_tools) {
+        } else if (id == R.id.nav_teleferico) {
             CameraPosition position = new CameraPosition.Builder()
-                    .target(new LatLng(-0.1949919, -78.482836)) // Sets the new camera position
+                    .target(new LatLng(-0.1923033, -78.5193715)) // Sets the new camera position
                     .zoom(15) // Sets the zoom
                     .build(); // Creates a CameraPosition from the builder
 
             mapboxMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(position), 500);
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_tema) {
             if (estilo) {
                 estilo = false;
                 cambiarTema(estilo);
@@ -197,8 +229,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 estilo = true;
                 cambiarTema(estilo);
             }
-
-        } else if (id == R.id.nav_send) {
 
         }
 
@@ -217,6 +247,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void cambiarTema(boolean estilo) {
         if (estilo) {
+            rutas = true;
+            mostrar = true;
             mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/danohealer/cjxrm9kn36lns1cqeups6qc3m"),
                     new Style.OnStyleLoaded() {
 
@@ -224,17 +256,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         public void onStyleLoaded(@NonNull final Style style) {
                             style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
                             style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
-                            style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(60, 255, 104, 51))), "settlement-label");
+                            style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(80,49,187,242))), "settlement-label");
+                            style.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID,
+                                    Feature.fromGeometry(Point.fromLngLat(origin.longitude(), origin.latitude()))));
+                            style.addSource(new GeoJsonSource("optimized-route-source-id"));
+                            findViewById(R.id.check_rutas).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (rutas) {
+                                        rutas = false;
+                                        initMarkerIconSymbolLayer(style);
+                                        initOptimizedRouteLineLayer(style);
+                                        Toast.makeText(MainActivity.this, R.string.rutas_activadas, Toast.LENGTH_SHORT).show();
+                                        mapboxMap.addOnMapClickListener(MainActivity.this);
+                                        mapboxMap.addOnMapLongClickListener(MainActivity.this);
+                                    } else {
+                                        rutas = true;
+                                        stops.clear();
+                                        if (mapboxMap != null) {
+                                            Style style = mapboxMap.getStyle();
+                                            if (style != null) {
+                                                resetDestinationMarkers(style);
+                                                removeOptimizedRoute(style);
+                                                removeMarkerIconSymbolLayer(style);
+                                                addFirstStopToStopsList();
+                                            }
+                                        }
+                                        mapboxMap.removeOnMapClickListener(MainActivity.this);
+                                        mapboxMap.removeOnMapLongClickListener(MainActivity.this);
+                                    }
+                                }
+                            });
 
                             findViewById(R.id.check_poligono).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
                                     if (mostrar == true) {
                                         mostrar = false;
-                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(0,255,104,51)));
+                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(0,49,187,242)));
                                     } else {
                                         mostrar = true;
-                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(60,255,104,51)));
+                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(80,49,187,242)));
                                     }
                                 }
                             });
@@ -243,6 +305,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     });
         } else {
+            rutas = true;
+            mostrar = true;
             mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/danohealer/cjxbcwi6s4eob1cpw6lupzig3"),
                     new Style.OnStyleLoaded() {
 
@@ -250,17 +314,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         public void onStyleLoaded(@NonNull final Style style) {
                             style.addSource(new GeoJsonSource(SEGURIDAD_SOURCE_ID, loadGeoJsonFromAsset("seguridad.geojson")));
                             style.addSource(new GeoJsonSource("source-id", loadGeoJsonFromAsset("poligono.geojson")));
-                            style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(60, 255, 104, 51))), "settlement-label");
+                            style.addLayerBelow(new FillLayer(LAYER_ID, "source-id").withProperties(fillColor(Color.argb(80,49,187,242))), "settlement-label");
+                            style.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID,
+                                    Feature.fromGeometry(Point.fromLngLat(origin.longitude(), origin.latitude()))));
+                            style.addSource(new GeoJsonSource("optimized-route-source-id"));
+                            findViewById(R.id.check_rutas).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (rutas) {
+                                        rutas = false;
+                                        initMarkerIconSymbolLayer(style);
+                                        initOptimizedRouteLineLayer(style);
+                                        Toast.makeText(MainActivity.this, R.string.rutas_activadas, Toast.LENGTH_SHORT).show();
+                                        mapboxMap.addOnMapClickListener(MainActivity.this);
+                                        mapboxMap.addOnMapLongClickListener(MainActivity.this);
+                                    } else {
+                                        rutas = true;
+                                        Toast.makeText(MainActivity.this, R.string.rutas_desactivadas, Toast.LENGTH_SHORT).show();
+                                        stops.clear();
+                                        if (mapboxMap != null) {
+                                            Style style = mapboxMap.getStyle();
+                                            if (style != null) {
+                                                resetDestinationMarkers(style);
+                                                removeOptimizedRoute(style);
+                                                removeMarkerIconSymbolLayer(style);
+                                                addFirstStopToStopsList();
+                                            }
+                                        }
+                                        mapboxMap.removeOnMapClickListener(MainActivity.this);
+                                        mapboxMap.removeOnMapLongClickListener(MainActivity.this);
+                                    }
+                                }
+                            });
 
                             findViewById(R.id.check_poligono).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
                                     if (mostrar == true) {
                                         mostrar = false;
-                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(0,255,104,51)));
+                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(0,49,187,242)));
                                     } else {
                                         mostrar = true;
-                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(60,255,104,51)));
+                                        style.getLayer(LAYER_ID).setProperties(fillColor(Color.argb(80,49,187,242)));
                                     }
                                 }
                             });
@@ -313,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 heatmapRadius(30f),
                 heatmapOpacity(0.6f)
         );
-        loadedMapStyle.addLayerAbove(layer, "parques");
+        loadedMapStyle.addLayerAbove(layer, "referencia");
         heat=true;
         findViewById(R.id.check_heat).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -484,6 +579,154 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    private void initMarkerIconSymbolLayer(@NonNull Style loadedMapStyle) {
+// Add the marker image to map
+        loadedMapStyle.addImage("icon-image", BitmapFactory.decodeResource(
+                this.getResources(), R.drawable.mapbox_marker_icon_default));
+// Add the source to the map
+        loadedMapStyle.addLayer(new SymbolLayer("icon-layer-id", ICON_GEOJSON_SOURCE_ID).withProperties(
+                iconImage("icon-image"),
+                iconSize(1f),
+                iconAllowOverlap(true),
+                iconIgnorePlacement(true),
+                iconOffset(new Float[] {0f, -4f})
+        ));
+    }
+
+    private void removeMarkerIconSymbolLayer(@NonNull Style loadedMapStyle) {
+        loadedMapStyle.removeImage("icon-image");
+        loadedMapStyle.removeLayer("icon-layer-id");
+        loadedMapStyle.removeLayer("optimized-route-layer-id");
+    }
+
+    private void initOptimizedRouteLineLayer(@NonNull Style loadedMapStyle) {
+        loadedMapStyle.addLayerBelow(new LineLayer("optimized-route-layer-id", "optimized-route-source-id")
+                .withProperties(
+                        lineColor(Color.parseColor(TEAL_COLOR)),
+                        lineWidth(POLYLINE_WIDTH)
+                ), "icon-layer-id");
+    }
+
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+// Optimization API is limited to 12 coordinate sets
+        if (alreadyTwelveMarkersOnMap()) {
+            Toast.makeText(MainActivity.this, R.string.only_twelve_stops_allowed, Toast.LENGTH_LONG).show();
+        } else {
+            Style style = mapboxMap.getStyle();
+            if (style != null) {
+                addDestinationMarker(style, point);
+                addPointToStopsList(point);
+                getOptimizedRoute(style, stops);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onMapLongClick(@NonNull LatLng point) {
+        stops.clear();
+        if (mapboxMap != null) {
+            Style style = mapboxMap.getStyle();
+            if (style != null) {
+                resetDestinationMarkers(style);
+                removeOptimizedRoute(style);
+                addFirstStopToStopsList();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void resetDestinationMarkers(@NonNull Style style) {
+        GeoJsonSource optimizedLineSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
+        if (optimizedLineSource != null) {
+            optimizedLineSource.setGeoJson(Point.fromLngLat(origin.longitude(), origin.latitude()));
+        }
+    }
+
+    private void removeOptimizedRoute(@NonNull Style style) {
+        GeoJsonSource optimizedLineSource = style.getSourceAs("optimized-route-source-id");
+        if (optimizedLineSource != null) {
+            optimizedLineSource.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {}));
+        }
+    }
+
+    private boolean alreadyTwelveMarkersOnMap() {
+        return stops.size() == 12;
+    }
+
+    private void addDestinationMarker(@NonNull Style style, LatLng point) {
+        List<Feature> destinationMarkerList = new ArrayList<>();
+        for (Point singlePoint : stops) {
+            destinationMarkerList.add(Feature.fromGeometry(
+                    Point.fromLngLat(singlePoint.longitude(), singlePoint.latitude())));
+        }
+        destinationMarkerList.add(Feature.fromGeometry(Point.fromLngLat(point.getLongitude(), point.getLatitude())));
+        GeoJsonSource iconSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
+        if (iconSource != null) {
+            iconSource.setGeoJson(FeatureCollection.fromFeatures(destinationMarkerList));
+        }
+    }
+
+    private void addPointToStopsList(LatLng point) {
+        stops.add(Point.fromLngLat(point.getLongitude(), point.getLatitude()));
+    }
+
+    private void addFirstStopToStopsList() {
+        // Set first stop
+        origin = Point.fromLngLat(-78.4675293843594, -0.15216391216929992);
+        stops.add(origin);
+    }
+
+    private void getOptimizedRoute(@NonNull final Style style, List<Point> coordinates) {
+        optimizedClient = MapboxOptimization.builder()
+                .source("first")
+                .destination("last")
+                .coordinates(coordinates)
+                .overview(DirectionsCriteria.OVERVIEW_FULL)
+                .profile(DirectionsCriteria.PROFILE_DRIVING)
+                .roundTrip(false)
+                .accessToken(Mapbox.getAccessToken())
+                .build();
+
+        optimizedClient.enqueueCall(new Callback<OptimizationResponse>() {
+            @Override
+            public void onResponse(Call<OptimizationResponse> call, Response<OptimizationResponse> response) {
+                if (!response.isSuccessful()) {
+                    Timber.d( getString(R.string.no_success));
+                    Toast.makeText(MainActivity.this, R.string.no_success, Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    if (response.body().trips().isEmpty()) {
+                        Timber.d("%s size = %s", getString(R.string.successful_but_no_routes), response.body().trips().size());
+
+                        Toast.makeText(MainActivity.this, R.string.successful_but_no_routes,
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
+// Get most optimized route from API response
+                optimizedRoute = response.body().trips().get(0);
+                drawOptimizedRoute(style, optimizedRoute);
+            }
+
+            @Override
+            public void onFailure(Call<OptimizationResponse> call, Throwable throwable) {
+                Timber.d("Error: %s", throwable.getMessage());
+            }
+        });
+    }
+
+    private void drawOptimizedRoute(@NonNull Style style, DirectionsRoute route) {
+        GeoJsonSource optimizedLineSource = style.getSourceAs("optimized-route-source-id");
+        if (optimizedLineSource != null) {
+            optimizedLineSource.setGeoJson(FeatureCollection.fromFeature(Feature.fromGeometry(
+                    LineString.fromPolyline(route.geometry(), PRECISION_6))));
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -510,11 +753,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStop() {
         super.onStop();
-
+        if (optimizedClient != null) {
+            optimizedClient.cancelCall();
+        }
+        if (mapboxMap != null) {
+            mapboxMap.removeOnMapClickListener(this);
+        }
         if (locationEngine != null) {
             locationEngine.removeLocationUpdates(callback);
         }
-
         mapView.onStop();
     }
 

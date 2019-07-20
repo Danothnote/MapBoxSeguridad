@@ -9,29 +9,25 @@
             android:icon="@drawable/ic_home_black_24dp"
             android:title="@string/menu_home" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_panecillo"
             android:icon="@drawable/ic_school_black_24dp"
-            android:title="@string/menu_gallery" />
+            android:title="@string/menu_panecillo" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_mitaddelmundo"
             android:icon="@drawable/ic_school_black_24dp"
-            android:title="@string/menu_slideshow" />
+            android:title="@string/menu_mitaddelmundo" />
         <item
-            android:id="@+id/nav_tools"
+            android:id="@+id/nav_teleferico"
             android:icon="@drawable/ic_school_black_24dp"
-            android:title="@string/menu_tools" />
+            android:title="@string/menu_teleferico" />
     </group>
 
     <item android:title="Communicate">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/nav_tema"
                 android:icon="@drawable/ic_brush_black_24dp"
-                android:title="@string/menu_share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="@string/menu_send" />
+                android:title="@string/menu_tema" />
         </menu>
     </item>
 
