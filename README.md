@@ -5,7 +5,9 @@ Muestra un clustering de los lugares donde han ocurrido insidentes de insegurida
 - Integración de objetos en 3D
 - Realidad Aumentada
 - Recomendaciones de lugares para visitar
-- Mapas Offline
+- Mapas Offline\
+- Modelo para identificar atractivos turísticos mediante imágenes
+- Aplicación Web multiplataforma
 ## Integrantes
 - Daniel Salazar
 - José Puga
