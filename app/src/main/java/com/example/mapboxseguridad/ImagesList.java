@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 public class ImagesList extends AppCompatActivity {
 
-    GridView gridView;
+    GridView gridView, gridviewImgUpdate;
     ArrayList<Image> list;
     ImageListAdapter adapter = null;
 
@@ -69,13 +69,19 @@ public class ImagesList extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int item) {
                         if (item == 0){
-                            Cursor consultSQL = AddAddress.sqLiteHelper.getData("SELECT id FROM IMAGE");
+                            Cursor consultSQL = AddAddress.sqLiteHelper.getData("SELECT * FROM IMAGE");
                             ArrayList<Integer> arrID = new ArrayList<Integer>();
+                            String nameUpdateImage = null;
+                            byte[] image = null;
                             while (consultSQL.moveToNext()){
                                 arrID.add(consultSQL.getInt(0));
+                                nameUpdateImage = consultSQL.getString(1);
+                                image = consultSQL.getBlob(2);
                             }
+
                             Toast.makeText(getApplicationContext(),"Actualizar", Toast.LENGTH_SHORT).show();
-                            showDialogUpdate(ImagesList.this, arrID.get(position));
+                            showDialogUpdate(ImagesList.this, arrID.get(position), nameUpdateImage, image );
+
 
                         }
                         else{
@@ -98,14 +104,19 @@ public class ImagesList extends AppCompatActivity {
     }
 
     ImageView viewimages;
-    private void showDialogUpdate(Activity activity, final int position){
+    EditText updateEditext;
+    private void showDialogUpdate(Activity activity, final int position, String name, byte[] image){
 
         final Dialog dialog = new Dialog(activity);
+
         dialog.setContentView(R.layout.update_image_activity);
         dialog.setTitle(R.string.btnUpdate);
 
         viewimages = (ImageView) dialog.findViewById(R.id.imgUpdate);
-
+        updateEditext = (EditText) dialog.findViewById(R.id.edtUpdateName);
+        Bitmap bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+        viewimages.setImageBitmap(bmp);
+        updateEditext.setText(name);
         final EditText textName = (EditText) dialog.findViewById(R.id.edtUpdateName);
         Button btnUpdate = (Button) dialog.findViewById(R.id.btnUpdate);
 
