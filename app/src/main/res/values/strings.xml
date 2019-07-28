@@ -8,21 +8,40 @@
     <string name="nav_header_title">SafeMove</string>
     <string name="nav_header_subtitle">SafeMove@correo.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Agregar Lugar</string>
 
+    <string name="action_settings">Agregar Fotografía</string>
+    <string name="EliminarFotografia">Eliminar Fotografía</string>
+    <string name="nameUser">Nombre</string>
+    <string name="btnSaveImage">Guardar</string>
+    <string name="btnFindImage">Cambiar imagen</string>
+    <string name="todo">TODO</string>
+    <string name="addImage">Añadir fotografía</string>
     <string name="menu_home">Página Principal</string>
     <string name="menu_panecillo">Panecillo</string>
     <string name="menu_mitaddelmundo">Mitad del Mundo</string>
     <string name="menu_teleferico">Teleférico</string>
     <string name="menu_tema">Tema Oscuro</string>
     <string name="title_activity_add_address">addAddress</string>
-
+    <string name="successUpdate">Actualización realizada con exito</string>
+    <string name="errorUpdate">Error al actualizar</string>
     <string name="rutas_activadas">Toque para añadir ubicación</string>
     <string name="rutas_desactivadas">Rutas Desactivadas</string>
     <string name="only_twelve_stops_allowed">Maximo se permiten 12 ubicaciones</string>
     <string name="no_success">Hubo un error</string>
     <string name="successful_but_no_routes">No hay rutas disponibles</string>
-
+    <string name="btnListImages">Listar imagenes </string>
     <string name="query_feature_marker_title"></string>
     <string name="query_feature_marker_snippet"></string>
+    <string name="errorPermissions">No tienes permisos para acceder a los ficheros</string>
+    <string name="btnUpdate">Actualizar</string>
+    <string name="saveSucefull">Imagen añadida correctamente</string>
+    <string name="errorSave">Error al añadir la imagen</string>
+    <string name="textview">TextView</string>
+    <string name="listImages">Lista de imagenes</string>
+    <string name="titleWarning">Atención</string>
+    <string name="questioDelete">¿Esta seguro de eliminar la imagen seleccionda?</string>
+    <string name="yes">Si</string>
+    <string name="cancel">Cancelar</string>
+    <string name="successDelete">Imágen eliminada con exito</string>
+    <string name="errorDelete">Error al eminar la imágen</string>
 </resources>

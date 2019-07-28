@@ -8,7 +8,6 @@ import android.graphics.PointF;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.ViewDebug;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -24,7 +23,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
-import com.google.gson.JsonElement;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -83,7 +81,6 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.linear;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity;
@@ -97,7 +94,8 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, MapboxMap.OnMapClickListener, MapboxMap.OnMapLongClickListener, PermissionsListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        OnMapReadyCallback, MapboxMap.OnMapClickListener, MapboxMap.OnMapLongClickListener, PermissionsListener {
 
     private static final String SEGURIDAD_SOURCE_ID = "seguridad-id";
     private static final String HEATMAP_LAYER_ID = "seguridad-heat";
@@ -134,19 +132,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean colocadop = false;
     private boolean colocadom = false;
     private boolean colocadot = false;
+    public static SQLiteHelper sqLiteHelper;
 
     private Marker featureMarker;
     private int conteo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         mostrar = true;
         Mapbox.getInstance(this, getString(R.string.access_token));
 
         setContentView(R.layout.activity_main);
-
-
 
         actionMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
         actionMenu.setClosedOnTouchOutside(true);
@@ -192,13 +190,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent activityAddres =new Intent(MainActivity.this, addAddress.class);
+        if (id == R.id.addImages) {
+            Intent activityAddres =new Intent(MainActivity.this, AddAddress.class);
             startActivity(activityAddres);
-            Toast.makeText(this, "Ingresar logitud y latitud", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.addImage, Toast.LENGTH_SHORT).show();
+            return true;
+        }else if (id == R.id.menlistImage){
 
+            Intent activityAddres =new Intent(MainActivity.this, ImagesList.class);
+            startActivity(activityAddres);
+            Toast.makeText(this, R.string.btnListImages, Toast.LENGTH_SHORT).show();
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
